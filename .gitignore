@@ -1,0 +1,10 @@
+# Ignore the following files/folders
+.DS_Store
+__pycache__
+*.pyc
+
+# Ignore udacity stuff
+.udacity-pa
+
+# Ignore the virtualenv folder
+venv

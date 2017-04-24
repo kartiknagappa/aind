@@ -1,0 +1,7 @@
+# Ignore the following files/folders
+.DS_Store
+__pycache__
+*.pyc
+
+# Ignore the virtualenv folder
+venv
