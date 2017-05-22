@@ -3,7 +3,7 @@ from operator import add
 
 board_squares_per_side = 7
 board_size = board_squares_per_side**2
-token = 'k'
+token = 'O'
 square_unused = ' '
 square_used = 'X'
 display_count = 0
@@ -104,15 +104,15 @@ def get_next_move(board, current_position):
   i = 0
   shuffle_position_order()
   while available_move is True:
-    # find the available move
-    next_position = current_position + relative_positions[position_order[i]]
-    if isValidIndex(next_position) and \
-       isLegalMove(new_board[next_position], current_position, next_position):
-      available_move = next_position
-
-    i += 1
     if i >= number_of_relative_positions:
       available_move = False
+    else:
+      # find the available move
+      next_position = current_position + relative_positions[position_order[i]]
+      i += 1
+      if isValidIndex(next_position) and \
+         isLegalMove(new_board[next_position], current_position, next_position):
+        available_move = next_position
 
   return available_move
 
@@ -120,7 +120,7 @@ def game():
   # initialize the board and pick a starting point
   board = [' ' for i in range(board_size)]
   current_position = invalid_index
-  next_position = getStartingPosition()
+  next_position = getStartingPosition(44)
 
   while next_position is not False:
     previous_position = current_position
