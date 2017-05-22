@@ -120,7 +120,7 @@ def game():
   # initialize the board and pick a starting point
   board = [' ' for i in range(board_size)]
   current_position = invalid_index
-  next_position = getStartingPosition(44)
+  next_position = getStartingPosition()
 
   while next_position is not False:
     previous_position = current_position
