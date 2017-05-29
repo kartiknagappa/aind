@@ -1,27 +1,39 @@
-from random import randrange, shuffle
+from math import floor, log
 from operator import add
+from random import randrange, shuffle
 
-board_squares_per_side = 7
-board_size = board_squares_per_side**2
-token = 'O'
-square_unused = ' '
-square_used = 'X'
-display_count = 0
+# board properties
+board_rows = 7
+board_columns = 7
+board_size = board_rows * board_columns
+
+# game properties
 invalid_index = -1
 first_move = True
 game_step = 0
 
 # relative L positions
 relative_positions = [
-  -13, # [-2, 1]
-   -5, # [-1, 2]
-    9, # [ 1, 2]
-   15, # [ 2, 1]
-   13, # [ 2,-1]
-    5, # [ 1,-2]
-   -9, # [-1,-2]
-  -15  # [-2,-1]
+  -2*board_columns + 1, # [-2, 1]
+  -1*board_columns + 2, # [-1, 2]
+   1*board_columns + 2, # [ 1, 2]
+   2*board_columns + 1, # [ 2, 1]
+   2*board_columns - 1, # [ 2,-1]
+   1*board_columns - 2, # [ 1,-2]
+  -1*board_columns - 2, # [-1,-2]
+  -2*board_columns - 1  # [-2,-1]
 ]
+
+# display format
+box_row_width=int(floor(log(board_rows-1,10)))+1
+box_column_width=int(floor(log(board_columns-1,10)))+1
+token = 'O'
+square_unused = ' '
+square_used = 'X'
+
+# display lines: these lines contain the column numbers and the separator
+line_0 = " "*box_row_width + " " + "".join("{:{width}}".format(i, width=box_column_width+1) for i in range(board_columns))
+line_1 = " "*(box_row_width+1) + "-" + "-"*(box_column_width+1)*board_columns
 
 number_of_relative_positions = len(relative_positions)
 position_order = list(range(number_of_relative_positions))
@@ -30,13 +42,13 @@ def indexToRowColumn(index):
   if index == invalid_index:
     return [invalid_index, invalid_index]
 
-  row = index // board_squares_per_side
-  column = index % board_squares_per_side
+  row = index // board_columns
+  column = index % board_columns
 
   return [row, column]
 
 def rowColumnToIndex(row, column):
-  return row * board_squares_per_side + column
+  return row * board_columns + column
 
 def isValidIndex(index):
   return 0 <= index < board_size
@@ -70,14 +82,12 @@ def displayBoard(board, previous_position=invalid_index, current_position=invali
   previous = formatPosition(previous_position)
   current = formatPosition(current_position)
 
-  print("\n({0:d}) ({1}->{2}): {3} -> {4}\n".format(game_step, previous_position, current_position, previous, current), end='')
-  print("\n   0 1 2 3 4 5 6", end='')
-  print("\n  ---------------", end='')
-  for r in range(board_squares_per_side):
-    print("\n{:d} |".format(r), end='')
-    for c in range(board_squares_per_side):
-      square = board[r * board_squares_per_side + c]
-      print("{:s}|".format(square), end='')
+  print("\n({0}) ({1}->{2}): {3} -> {4}\n".format(game_step, previous_position, current_position, previous, current), end='')
+  print(line_0)
+  print(line_1)
+  for r in range(board_rows):
+    line_r = "{:{width}}".format(r, width=box_row_width) + " |" + "".join("{:{width}}|".format(board[r * board_columns + c], width=box_column_width) for c in range(board_columns))
+    print(line_r)
   print("")
 
 def move(board, current_position, new_position):
