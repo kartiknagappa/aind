@@ -2,6 +2,14 @@ from math import floor, log
 from operator import add
 from random import randrange, shuffle
 
+# configurable items
+board_column_separator = ' '
+board_row_separator = ''
+token = 'O'
+square_unused = '.'
+square_used = 'X'
+display_horizontal_rule = False
+
 # board properties
 board_rows = 7
 board_columns = 7
@@ -27,13 +35,12 @@ relative_positions = [
 # display format
 box_row_width=int(floor(log(board_rows-1,10)))+1
 box_column_width=int(floor(log(board_columns-1,10)))+1
-token = 'O'
-square_unused = ' '
-square_used = 'X'
 
 # display lines: these lines contain the column numbers and the separator
-line_0 = " "*box_row_width + " " + "".join("{:{width}}".format(i, width=box_column_width+1) for i in range(board_columns))
-line_1 = " "*(box_row_width+1) + "-" + "-"*(box_column_width+1)*board_columns
+padding = len(board_column_separator)
+board_grid_alignment = " "*(box_row_width+1)
+board_column_headings = "".join("{:{width}}".format(i, width=box_column_width+padding) for i in range(board_columns))
+board_horizontal_rule = board_row_separator*(padding+(box_column_width+padding)*board_columns)
 
 number_of_relative_positions = len(relative_positions)
 position_order = list(range(number_of_relative_positions))
@@ -58,13 +65,13 @@ def isLegalMove(target_square_state, current_position, new_position):
     if first_move:
       return True
 
-    if isValidIndex(current_position) and \
-      isValidIndex(new_position):
+    if isValidIndex(current_position) and isValidIndex(new_position):
       currentRowColumn = indexToRowColumn(current_position)
       newRowColumn = indexToRowColumn(new_position)
       distance_between_rows = abs(currentRowColumn[0] - newRowColumn[0])
       distance_between_columns = abs(currentRowColumn[1] - newRowColumn[1])
-      return (distance_between_rows == 1 and distance_between_columns == 2) or (distance_between_rows == 2 and distance_between_columns == 1)
+      return (distance_between_rows == 1 and distance_between_columns == 2) or \
+             (distance_between_rows == 2 and distance_between_columns == 1)
 
   return False
 
@@ -83,11 +90,15 @@ def displayBoard(board, previous_position=invalid_index, current_position=invali
   current = formatPosition(current_position)
 
   print("\n({0}) ({1}->{2}): {3} -> {4}\n".format(game_step, previous_position, current_position, previous, current), end='')
-  print(line_0)
-  print(line_1)
+  print(board_grid_alignment + board_column_headings)
+  print(board_grid_alignment + board_horizontal_rule)
   for r in range(board_rows):
-    line_r = "{:{width}}".format(r, width=box_row_width) + " |" + "".join("{:{width}}|".format(board[r * board_columns + c], width=box_column_width) for c in range(board_columns))
-    print(line_r)
+    line_r_row_number_format = "{:{width}} ".format(r, width=box_row_width) + board_column_separator
+    line_r_row_positions_format = "".join("{0:>{width}}{1}".format(board[r * board_columns + c], board_column_separator,\
+                                    width=box_column_width) for c in range(board_columns))
+    print(line_r_row_number_format+line_r_row_positions_format)
+    if display_horizontal_rule:
+      print(board_grid_alignment + board_horizontal_rule)
   print("")
 
 def move(board, current_position, new_position):
@@ -108,6 +119,11 @@ def shuffle_position_order():
   shuffle(position_order)
 
 def get_next_move(board, current_position):
+  global first_move
+
+  if first_move:
+    return getStartingPosition()
+
   available_move = True
   new_board = board[:]
 
@@ -128,7 +144,7 @@ def get_next_move(board, current_position):
 
 def game():
   # initialize the board and pick a starting point
-  board = [' ' for i in range(board_size)]
+  board = [square_unused for i in range(board_size)]
   current_position = invalid_index
   next_position = getStartingPosition()
 
