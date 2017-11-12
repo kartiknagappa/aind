@@ -3,6 +3,7 @@ test your agent's strength against a set of known agents using tournament.py
 and include the results in your report.
 """
 import random
+from operator import add
 
 
 class SearchTimeout(Exception):
